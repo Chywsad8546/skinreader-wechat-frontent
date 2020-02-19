@@ -133,27 +133,39 @@
                  }
 
              },
+                    // JS`正则表达式`获取地址栏url参数：
+             getUrlParam(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); // 构造一个含有目标参数的正则表达式对象
+                var r = window.location.search.substr(1).match(reg); // 匹配目标参数
+                if (r != null) return unescape(r[2]);
+                return null; // 返回参数值
+            },
                 //引用hint()在最上方弹出提示
             async  hint() {
                  let param = this.$route.query
-                 console.log(param)
+                console.log(this.getUrlParam('code'))
 
+                let weCode = this.getUrlParam('code');
+
+                this.$message.info(weCode);
 
                 if (param.state =='pation'){
                     this.roleKey = 2
                 }else if (param.state == 'doctor') {
                     this.roleKey = 1
                 }
-                 let variables = {code:param.code}
+
+                 let variables = {code:weCode}
                  const res = await this.$apollo.query({
                      query: gql`query($code: String!){
-                     getFWHCode
+                     getFWHCode(code: $code)
                    }`,
                      variables,
                  });
-                if (res != 'errcode'){
-                    this.openid = res
+                if (res.data.getFWHCode != 'errcode'){
+                    this.openid = res.data.getFWHCode
                 }
+                this.$message.info(res.data.getFWHCode);
             }
 
         },
